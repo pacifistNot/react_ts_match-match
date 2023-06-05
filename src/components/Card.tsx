@@ -1,4 +1,5 @@
 import React from "react";
+import backImg from "../img/back.png";
 
 interface CardProps {
   value: string;
@@ -14,7 +15,11 @@ const Card: React.FC<CardProps> = ({ value, isOpen, isMatched, onClick }) => {
 
   return (
     <div className={cardClass} onClick={onClick}>
-      {isOpen || isMatched ? value : "?"}
+      {isOpen || isMatched ? (
+        value
+      ) : (
+        <img className="card__img" src={backImg} alt="Card Back" />
+      )}
     </div>
   );
 };

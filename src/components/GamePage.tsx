@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Button } from "antd";
+import React, { useState, useEffect, useRef } from "react";
+import { Button, Space, Row } from "antd";
 import GameBoard from "../components/GameBoard";
 import Card from "../components/Card";
 
@@ -10,28 +10,63 @@ interface CardData {
   isMatched: boolean;
 }
 
-const GamePage: React.FC = () => {
+interface GamePageProps {
+  difficulty: string;
+}
+
+const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
   const [cards, setCards] = useState<CardData[]>([]);
   const [time, setTime] = useState(0);
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   const [openCards, setOpenCards] = useState<CardData[]>([]);
   const [isPaused, setIsPaused] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const resetTimer = () => {
+    setTime(0);
+  };
 
   useEffect(() => {
     generateCards();
-  }, []);
+    resetTimer();
+  }, [difficulty]);
 
   useEffect(() => {
     if (cards.every((card) => card.isMatched)) {
-      clearInterval(intervalId!);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     }
-  }, [cards, intervalId]);
+  }, [cards]);
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      if (!isPaused) {
+        setTime((time) => time + 1);
+      }
+    }, 1000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isPaused]);
 
   const generateCards = () => {
+    let pairCount = 0;
+
+    if (difficulty === "Easy") {
+      pairCount = 4;
+    } else if (difficulty === "Medium") {
+      pairCount = 6;
+    } else if (difficulty === "Hard") {
+      pairCount = 8;
+    }
+
     const values = ["A", "B", "C", "D", "E", "F", "G", "H"];
     const initialCards: CardData[] = [];
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < pairCount; i++) {
       initialCards.push({
         id: i * 2,
         value: values[i],
@@ -83,28 +118,19 @@ const GamePage: React.FC = () => {
             );
             setCards(updatedCards);
             setOpenCards([]);
-          }, 1500);
+          }, 1000);
         }
       }
     }
   };
 
-  useEffect(() => {
-    const id: NodeJS.Timeout = setInterval(() => {
-      if (!isPaused) {
-        setTime((time) => time + 1);
-      }
-    }, 1000);
-
-    setIntervalId(id);
-
-    return () => {
-      clearInterval(id);
-    };
-  }, [isPaused]);
-
   const handlePausedGame = () => {
     setIsPaused(!isPaused);
+  };
+
+  const handleNewGame = () => {
+    generateCards();
+    resetTimer();
   };
 
   return (
@@ -113,19 +139,24 @@ const GamePage: React.FC = () => {
         <div className="game__time">Time: {time} sec</div>
       </div>
       <GameBoard>
-        {cards.map((card) => (
-          <Card
-            key={card.id}
-            value={card.value}
-            isOpen={card.isOpen}
-            isMatched={card.isMatched}
-            onClick={() => handleCardClick(card)}
-          />
-        ))}
+        <Space size="small" wrap>
+          <Row gutter={[16, 16]}>
+            {cards.map((card) => (
+              <Card
+                key={card.id}
+                value={card.value}
+                isOpen={card.isOpen}
+                isMatched={card.isMatched}
+                onClick={() => handleCardClick(card)}
+              />
+            ))}
+          </Row>
+        </Space>
       </GameBoard>
       <Button type="primary" onClick={handlePausedGame}>
         {isPaused ? "Продолжить" : "Пауза"}
       </Button>
+      <Button onClick={handleNewGame}>Новая игра</Button>
     </div>
   );
 };
