@@ -9,17 +9,17 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ value, isOpen, isMatched, onClick }) => {
-  const cardClass = `card ${isOpen ? "open" : ""} ${
-    isMatched ? "matched" : ""
-  }`;
+  const imageSource = value === "back" ? backImg : value;
+  const content =
+    isOpen || isMatched ? (
+      <img className="card__img" src={imageSource} alt="" />
+    ) : (
+      <img className="card__img" src={backImg} alt="" />
+    );
 
   return (
-    <div className={cardClass} onClick={onClick}>
-      {isOpen || isMatched ? (
-        value
-      ) : (
-        <img className="card__img" src={backImg} alt="Card Back" />
-      )}
+    <div className="card" onClick={onClick}>
+      {content}
     </div>
   );
 };

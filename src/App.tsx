@@ -42,13 +42,10 @@ const App: React.FC = () => {
           >
             Сложно
           </Button>
-          <p>Нажми "Начать играть", чтобы запустить игру</p>
+          <p>Нажми "Старт", чтобы запустить игру</p>
           <Button type="link">
-            <Link to="/game">Начать играть</Link>
+            <Link to="/game">Старт</Link>
           </Button>
-          {/* <Button type="link">
-            <Link to="/">Закончить игру</Link>
-          </Button> */}
         </div>
       </div>
       <Routes>

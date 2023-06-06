@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Space, Row } from "antd";
+import { Button, Space, Row, Col } from "antd";
 import GameBoard from "../components/GameBoard";
 import Card from "../components/Card";
 
@@ -128,10 +128,10 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
     setIsPaused(!isPaused);
   };
 
-  const handleNewGame = () => {
-    generateCards();
-    resetTimer();
-  };
+  // const handleNewGame = () => {
+  //   resetTimer();
+  //   generateCards();
+  // };
 
   return (
     <div className="game">
@@ -140,15 +140,35 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
       </div>
       <GameBoard>
         <Space size="small" wrap>
-          <Row gutter={[16, 16]}>
+          <Row gutter={[24, 24]}>
             {cards.map((card) => (
-              <Card
-                key={card.id}
-                value={card.value}
-                isOpen={card.isOpen}
-                isMatched={card.isMatched}
-                onClick={() => handleCardClick(card)}
-              />
+              <Col span={6} key={card.id}>
+                <Card
+                  key={card.id}
+                  value={
+                    card.value === "A"
+                      ? require("../img/A.png")
+                      : card.value === "B"
+                      ? require("../img/B.png")
+                      : card.value === "C"
+                      ? require("../img/C.png")
+                      : card.value === "D"
+                      ? require("../img/D.png")
+                      : card.value === "E"
+                      ? require("../img/E.png")
+                      : card.value === "F"
+                      ? require("../img/F.png")
+                      : card.value === "G"
+                      ? require("../img/G.png")
+                      : card.value === "H"
+                      ? require("../img/H.png")
+                      : card.value
+                  }
+                  isOpen={card.isOpen}
+                  isMatched={card.isMatched}
+                  onClick={() => handleCardClick(card)}
+                />
+              </Col>
             ))}
           </Row>
         </Space>
@@ -156,7 +176,7 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
       <Button type="primary" onClick={handlePausedGame}>
         {isPaused ? "Продолжить" : "Пауза"}
       </Button>
-      <Button onClick={handleNewGame}>Новая игра</Button>
+      {/* <Button onClick={handleNewGame}>Новая игра</Button> */}
     </div>
   );
 };
