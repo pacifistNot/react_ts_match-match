@@ -1,5 +1,6 @@
 import React from "react";
 import backImg from "../img/back.png";
+import "../scss/style.css";
 
 interface CardProps {
   value: string;
@@ -17,9 +18,15 @@ const Card: React.FC<CardProps> = ({ value, isOpen, isMatched, onClick }) => {
       <img className="card__img" src={backImg} alt="" />
     );
 
+  const handleClick = () => {
+    if (!isOpen && !isMatched) {
+      onClick();
+    }
+  };
+
   return (
-    <div className="card" onClick={onClick}>
-      {content}
+    <div className={`card ${isOpen ? "open" : ""}`} onClick={handleClick}>
+      <div className="card__content">{content}</div>
     </div>
   );
 };
