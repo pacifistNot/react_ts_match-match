@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Space, Row, Col } from "antd";
+import { Button, Space, Row, Col, Modal } from "antd";
 import GameBoard from "../components/GameBoard";
 import Card from "../components/Card";
 
@@ -19,6 +19,7 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
   const [time, setTime] = useState(0);
   const [openCards, setOpenCards] = useState<CardData[]>([]);
   const [isPaused, setIsPaused] = useState(false);
+  const [isGameFinished, setIsGameFinished] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const resetTimer = () => {
@@ -35,6 +36,9 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
+      setIsGameFinished(true);
+    } else {
+      setIsGameFinished(false);
     }
   }, [cards]);
 
@@ -108,7 +112,7 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
             );
             setCards(updatedCards);
             setOpenCards([]);
-          }, 500);
+          }, 300);
         } else {
           setTimeout(() => {
             const updatedCards = cards.map((c) =>
@@ -128,10 +132,11 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
     setIsPaused(!isPaused);
   };
 
-  // const handleNewGame = () => {
-  //   resetTimer();
-  //   generateCards();
-  // };
+  const handleNewGame = () => {
+    resetTimer();
+    generateCards();
+    setIsGameFinished(false);
+  };
 
   return (
     <div className="game">
@@ -176,7 +181,19 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
       <Button type="primary" onClick={handlePausedGame}>
         {isPaused ? "Продолжить" : "Пауза"}
       </Button>
-      {/* <Button onClick={handleNewGame}>Новая игра</Button> */}
+      <Button onClick={handleNewGame}>Перемешать</Button>
+      <Modal
+        open={isGameFinished}
+        title="Поздравляем!"
+        onCancel={() => setIsGameFinished(false)}
+        footer={[
+          <Button key="newGame" onClick={handleNewGame}>
+            Начать новую игру
+          </Button>,
+        ]}
+      >
+        <p>Вы завершили игру! Хотите начать новую игру?</p>
+      </Modal>
     </div>
   );
 };
