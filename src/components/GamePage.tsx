@@ -1,30 +1,44 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import { Button, Space, Row, Col, Modal } from "antd";
 import GameBoard from "../components/GameBoard";
 import Card from "../components/Card";
 
-interface CardData {
+enum Difficulty {
+  Easy = "Легкая",
+  Medium = "Средняя",
+  Hard = "Сложная",
+}
+
+interface ICard {
   id: number;
   value: string;
   isOpen: boolean;
   isMatched: boolean;
 }
 
-interface GamePageProps {
-  difficulty: string;
-}
-
-const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
-  const [cards, setCards] = useState<CardData[]>([]);
+const GamePage: React.FC = () => {
+  const [cards, setCards] = useState<ICard[]>([]);
   const [time, setTime] = useState(0);
-  const [openCards, setOpenCards] = useState<CardData[]>([]);
+  const [openCards, setOpenCards] = useState<ICard[]>([]);
   const [isPaused, setIsPaused] = useState(false);
   const [isGameFinished, setIsGameFinished] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [difficulty, setDifficulty] = useState(Difficulty.Easy);
+
+  const handleDifficultyChange = (selectedDifficulty: Difficulty) => {
+    setDifficulty(selectedDifficulty);
+  };
 
   const resetTimer = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
     setTime(0);
+    intervalRef.current = setInterval(() => {
+      if (!isPaused) {
+        setTime((time) => time + 1);
+      }
+    }, 1000);
   };
 
   useEffect(() => {
@@ -41,7 +55,7 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
     } else {
       setIsGameFinished(false);
     }
-  }, [cards]);
+  });
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
@@ -60,16 +74,16 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
   const generateCards = () => {
     let pairCount = 0;
 
-    if (difficulty === "Easy") {
+    if (difficulty === "Легкая") {
       pairCount = 4;
-    } else if (difficulty === "Medium") {
+    } else if (difficulty === "Средняя") {
       pairCount = 6;
-    } else if (difficulty === "Hard") {
+    } else if (difficulty === "Сложная") {
       pairCount = 8;
     }
 
     const values = ["A", "B", "C", "D", "E", "F", "G", "H"];
-    const initialCards: CardData[] = [];
+    const initialCards: ICard[] = [];
 
     for (let i = 0; i < pairCount; i++) {
       initialCards.push({
@@ -91,7 +105,7 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
     setCards(shuffledCards);
   };
 
-  const handleCardClick = (card: CardData) => {
+  const handleCardClick = (card: ICard) => {
     if (isPaused) {
       return;
     }
@@ -129,11 +143,14 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
     }
   };
 
-  const handlePausedGame = () => {
-    setIsPaused(!isPaused);
+  const handlePause = () => {
+    setIsPaused((prevIsPaused) => !prevIsPaused);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
   };
 
-  const handleShuffle = () => {
+  const handleNewGame = () => {
     resetTimer();
     generateCards();
   };
@@ -163,6 +180,25 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
   return (
     <div className="game">
       <div className="game__header">
+        <p>Выбранная сложность: {difficulty}</p>
+        <Button
+          type="link"
+          onClick={() => handleDifficultyChange(Difficulty.Easy)}
+        >
+          Легко
+        </Button>
+        <Button
+          type="link"
+          onClick={() => handleDifficultyChange(Difficulty.Medium)}
+        >
+          Средне
+        </Button>
+        <Button
+          type="link"
+          onClick={() => handleDifficultyChange(Difficulty.Hard)}
+        >
+          Сложно
+        </Button>
         <div className="game__time">Time: {time} sec</div>
       </div>
       <GameBoard>
@@ -182,22 +218,21 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
           </Row>
         </Space>
       </GameBoard>
-      <Button type="primary" onClick={handlePausedGame}>
+      <Button type="primary" onClick={handlePause}>
         {isPaused ? "Продолжить" : "Пауза"}
       </Button>
-      <Button onClick={handleShuffle}>Перемешать</Button>
+      <Button onClick={handleNewGame}>Заново</Button>
       <Modal
         open={isGameFinished}
-        title="Поздравляем, Вы завершили игру!"
+        title="Поздравляем!"
         onCancel={() => setIsGameFinished(false)}
-        footer={null}
+        footer={[
+          <Button key="newGame" onClick={handleNewGame}>
+            Начать новую игру
+          </Button>,
+        ]}
       >
-        <footer>
-          <p>Попробуйте выбрать другую сложность</p>
-          <Link to="/">
-            <Button key="returnToApp">Новая игра</Button>
-          </Link>
-        </footer>
+        <p>Вы завершили игру! Хотите начать новую?</p>
       </Modal>
     </div>
   );
