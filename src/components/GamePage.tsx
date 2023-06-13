@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { Button, Space, Row, Col, Modal } from "antd";
 import GameBoard from "../components/GameBoard";
 import Card from "../components/Card";
@@ -132,10 +133,31 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
     setIsPaused(!isPaused);
   };
 
-  const handleNewGame = () => {
+  const handleShuffle = () => {
     resetTimer();
     generateCards();
-    setIsGameFinished(false);
+  };
+
+  const getValue = (value: string) => {
+    if (value === "A") {
+      return require("../img/A.png");
+    } else if (value === "B") {
+      return require("../img/B.png");
+    } else if (value === "C") {
+      return require("../img/C.png");
+    } else if (value === "D") {
+      return require("../img/D.png");
+    } else if (value === "E") {
+      return require("../img/E.png");
+    } else if (value === "F") {
+      return require("../img/F.png");
+    } else if (value === "G") {
+      return require("../img/G.png");
+    } else if (value === "H") {
+      return require("../img/H.png");
+    } else {
+      return value;
+    }
   };
 
   return (
@@ -144,31 +166,13 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
         <div className="game__time">Time: {time} sec</div>
       </div>
       <GameBoard>
-        <Space size="small" wrap>
+        <Space wrap>
           <Row gutter={[24, 24]}>
             {cards.map((card) => (
               <Col span={6} key={card.id}>
                 <Card
                   key={card.id}
-                  value={
-                    card.value === "A"
-                      ? require("../img/A.png")
-                      : card.value === "B"
-                      ? require("../img/B.png")
-                      : card.value === "C"
-                      ? require("../img/C.png")
-                      : card.value === "D"
-                      ? require("../img/D.png")
-                      : card.value === "E"
-                      ? require("../img/E.png")
-                      : card.value === "F"
-                      ? require("../img/F.png")
-                      : card.value === "G"
-                      ? require("../img/G.png")
-                      : card.value === "H"
-                      ? require("../img/H.png")
-                      : card.value
-                  }
+                  value={getValue(card.value)}
                   isOpen={card.isOpen}
                   isMatched={card.isMatched}
                   onClick={() => handleCardClick(card)}
@@ -181,18 +185,19 @@ const GamePage: React.FC<GamePageProps> = ({ difficulty }) => {
       <Button type="primary" onClick={handlePausedGame}>
         {isPaused ? "Продолжить" : "Пауза"}
       </Button>
-      <Button onClick={handleNewGame}>Перемешать</Button>
+      <Button onClick={handleShuffle}>Перемешать</Button>
       <Modal
         open={isGameFinished}
-        title="Поздравляем!"
+        title="Поздравляем, Вы завершили игру!"
         onCancel={() => setIsGameFinished(false)}
-        footer={[
-          <Button key="newGame" onClick={handleNewGame}>
-            Начать новую игру
-          </Button>,
-        ]}
+        footer={null}
       >
-        <p>Вы завершили игру! Хотите начать новую игру?</p>
+        <footer>
+          <p>Попробуйте выбрать другую сложность</p>
+          <Link to="/">
+            <Button key="returnToApp">Новая игра</Button>
+          </Link>
+        </footer>
       </Modal>
     </div>
   );

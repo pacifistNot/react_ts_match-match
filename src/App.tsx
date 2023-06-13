@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { Divider, Space, Button } from "antd";
+import { Button } from "antd";
 import GamePage from "./components/GamePage";
 import "./scss/style.css";
 
@@ -19,7 +19,6 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <Space split={<Divider type="vertical" />}></Space>
       <div>
         <div className="home-page">
           <h1>Welcome to Match-Match Game!</h1>
@@ -43,7 +42,7 @@ const App: React.FC = () => {
             Сложно
           </Button>
           <p>Нажми "Старт", чтобы запустить игру</p>
-          <Button type="link">
+          <Button>
             <Link to="/game">Старт</Link>
           </Button>
         </div>
