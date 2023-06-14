@@ -2,6 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button, Space, Row, Col, Modal } from "antd";
 import GameBoard from "../components/GameBoard";
 import Card from "../components/Card";
+import AImage from "../img/A.png";
+import BImage from "../img/B.png";
+import CImage from "../img/C.png";
+import DImage from "../img/D.png";
+import EImage from "../img/E.png";
+import FImage from "../img/F.png";
+import GImage from "../img/G.png";
+import HImage from "../img/H.png";
 
 enum Difficulty {
   Easy = "Легкая",
@@ -24,6 +32,17 @@ const GamePage: React.FC = () => {
   const [isGameFinished, setIsGameFinished] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [difficulty, setDifficulty] = useState(Difficulty.Easy);
+
+  const imageMap: { [key: string]: string } = {
+    A: AImage,
+    B: BImage,
+    C: CImage,
+    D: DImage,
+    E: EImage,
+    F: FImage,
+    G: GImage,
+    H: HImage,
+  };
 
   const handleDifficultyChange = (selectedDifficulty: Difficulty) => {
     setDifficulty(selectedDifficulty);
@@ -105,39 +124,41 @@ const GamePage: React.FC = () => {
     setCards(shuffledCards);
   };
 
-  const handleCardClick = (card: ICard) => {
+  const delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  const handleCardClick = async (card: ICard) => {
     if (isPaused) {
       return;
     }
+
     if (!card.isOpen && !card.isMatched && openCards.length < 2) {
       const updatedCards = cards.map((c) =>
         c.id === card.id ? { ...c, isOpen: true } : c
       );
       setCards(updatedCards);
 
-      setOpenCards([...openCards, card]);
+      setOpenCards((prevOpenCards) => [...prevOpenCards, card]);
 
       if (openCards.length === 1) {
         if (card.value === openCards[0].value) {
-          setTimeout(() => {
-            const updatedCards = cards.map((c) =>
-              c.id === card.id || c.id === openCards[0].id
-                ? { ...c, isOpen: false, isMatched: true }
-                : c
-            );
-            setCards(updatedCards);
-            setOpenCards([]);
-          }, 300);
+          const updatedCards = cards.map((c) =>
+            c.id === card.id || c.id === openCards[0].id
+              ? { ...c, isOpen: false, isMatched: true }
+              : c
+          );
+          setCards(updatedCards);
+          setOpenCards([]);
         } else {
-          setTimeout(() => {
-            const updatedCards = cards.map((c) =>
-              c.id === card.id || c.id === openCards[0].id
-                ? { ...c, isOpen: false }
-                : c
-            );
-            setCards(updatedCards);
-            setOpenCards([]);
-          }, 1000);
+          await delay(700);
+
+          const updatedCards = cards.map((c) =>
+            c.id === card.id || c.id === openCards[0].id
+              ? { ...c, isOpen: false }
+              : c
+          );
+          setCards(updatedCards);
+          setOpenCards([]);
         }
       }
     }
@@ -153,28 +174,6 @@ const GamePage: React.FC = () => {
   const handleNewGame = () => {
     resetTimer();
     generateCards();
-  };
-
-  const getValue = (value: string) => {
-    if (value === "A") {
-      return require("../img/A.png");
-    } else if (value === "B") {
-      return require("../img/B.png");
-    } else if (value === "C") {
-      return require("../img/C.png");
-    } else if (value === "D") {
-      return require("../img/D.png");
-    } else if (value === "E") {
-      return require("../img/E.png");
-    } else if (value === "F") {
-      return require("../img/F.png");
-    } else if (value === "G") {
-      return require("../img/G.png");
-    } else if (value === "H") {
-      return require("../img/H.png");
-    } else {
-      return value;
-    }
   };
 
   return (
@@ -208,7 +207,7 @@ const GamePage: React.FC = () => {
               <Col span={6} key={card.id}>
                 <Card
                   key={card.id}
-                  value={getValue(card.value)}
+                  value={imageMap[card.value] ?? card.value}
                   isOpen={card.isOpen}
                   isMatched={card.isMatched}
                   onClick={() => handleCardClick(card)}
