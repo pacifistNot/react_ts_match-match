@@ -32,6 +32,7 @@ const GamePage: React.FC = () => {
   const [isGameFinished, setIsGameFinished] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [difficulty, setDifficulty] = useState(Difficulty.Easy);
+  const [isPausedDefault, setIsPausedDefault] = useState(false);
 
   const imageMap: { [key: string]: string } = {
     A: AImage,
@@ -46,6 +47,7 @@ const GamePage: React.FC = () => {
 
   const handleDifficultyChange = (selectedDifficulty: Difficulty) => {
     setDifficulty(selectedDifficulty);
+    setIsPaused(isPausedDefault);
   };
 
   const resetTimer = () => {
@@ -74,7 +76,7 @@ const GamePage: React.FC = () => {
     } else {
       setIsGameFinished(false);
     }
-  });
+  }, [cards]);
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
@@ -174,6 +176,7 @@ const GamePage: React.FC = () => {
   const handleNewGame = () => {
     resetTimer();
     generateCards();
+    setIsPaused(isPausedDefault);
   };
 
   return (

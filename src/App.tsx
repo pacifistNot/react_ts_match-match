@@ -11,8 +11,8 @@ const App: React.FC = () => {
         <div className="home-page">
           <h1>Welcome to Match-Match Game!</h1>
           <p>Нажми "Старт", чтобы запустить игру</p>
-          <Button>
-            <Link to="/game">Старт</Link>
+          <Button className="start__btn">
+            <Link className="start__link" to="/game">Старт</Link>
           </Button>
         </div>
       </div>

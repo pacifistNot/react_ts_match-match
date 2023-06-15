@@ -18,10 +18,24 @@ html {
 .card__content {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  -o-object-fit: cover;
+     object-fit: cover;
   transition: transform 0.8s ease;
 }
 
 .card.open .card__content {
   transform: rotateY(180deg);
+}
+
+.start__btn {
+  position: relative;
+}
+
+.start__link::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
 }/*# sourceMappingURL=style.css.map */
