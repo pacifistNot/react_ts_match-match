@@ -30,7 +30,6 @@ html {
 .start__btn {
   position: relative;
 }
-
 .start__link::before {
   content: "";
   position: absolute;
@@ -38,4 +37,9 @@ html {
   height: 100%;
   top: 0;
   left: 0;
+}
+
+.game__finished-title {
+  margin-bottom: 20px;
+  font-size: 50px;
 }/*# sourceMappingURL=style.css.map */

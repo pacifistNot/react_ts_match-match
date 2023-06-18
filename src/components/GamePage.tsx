@@ -51,16 +51,16 @@ const GamePage: React.FC = () => {
   };
 
   const resetTimer = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+  if (intervalRef.current) {
+    clearInterval(intervalRef.current);
+  }
+  setTime(0);
+  intervalRef.current = setInterval(() => {
+    if (!isPaused) {
+      setTime((time) => time + 1);
     }
-    setTime(0);
-    intervalRef.current = setInterval(() => {
-      if (!isPaused) {
-        setTime((time) => time + 1);
-      }
-    }, 1000);
-  };
+  }, 1000);
+};
 
   useEffect(() => {
     generateCards();
@@ -76,7 +76,7 @@ const GamePage: React.FC = () => {
     } else {
       setIsGameFinished(false);
     }
-  }, [cards]);
+  }, [cards]);  
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
@@ -126,9 +126,6 @@ const GamePage: React.FC = () => {
     setCards(shuffledCards);
   };
 
-  const delay = (ms: number) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
-
   const handleCardClick = async (card: ICard) => {
     if (isPaused) {
       return;
@@ -140,29 +137,35 @@ const GamePage: React.FC = () => {
       );
       setCards(updatedCards);
 
-      setOpenCards((prevOpenCards) => [...prevOpenCards, card]);
-
-      if (openCards.length === 1) {
-        if (card.value === openCards[0].value) {
-          const updatedCards = cards.map((c) =>
-            c.id === card.id || c.id === openCards[0].id
-              ? { ...c, isOpen: false, isMatched: true }
-              : c
-          );
-          setCards(updatedCards);
-          setOpenCards([]);
-        } else {
-          await delay(700);
-
-          const updatedCards = cards.map((c) =>
-            c.id === card.id || c.id === openCards[0].id
-              ? { ...c, isOpen: false }
-              : c
-          );
-          setCards(updatedCards);
-          setOpenCards([]);
+      setOpenCards((prevOpenCards) => {
+        const updatedOpenCards = [...prevOpenCards, card];
+      
+        if (updatedOpenCards.length === 2) {
+          if (card.value === updatedOpenCards[0].value) {
+            setTimeout(() => {
+              const updatedCards = cards.map((c) =>
+                c.id === card.id || c.id === updatedOpenCards[0].id
+                  ? { ...c, isOpen: false, isMatched: true }
+                  : c
+              );
+              setCards(updatedCards);
+            }, 700);
+          } else {
+            setTimeout(() => {
+              const updatedCards = cards.map((c) =>
+                c.id === card.id || c.id === updatedOpenCards[0].id
+                  ? { ...c, isOpen: false }
+                  : c
+              );
+              setCards(updatedCards);
+            }, 700);
+          }
+        
+          return [];
         }
-      }
+      
+        return updatedOpenCards;
+      });
     }
   };
 
@@ -224,18 +227,12 @@ const GamePage: React.FC = () => {
         {isPaused ? "Продолжить" : "Пауза"}
       </Button>
       <Button onClick={handleNewGame}>Заново</Button>
-      <Modal
-        open={isGameFinished}
-        title="Поздравляем!"
-        onCancel={() => setIsGameFinished(false)}
-        footer={[
-          <Button key="newGame" onClick={handleNewGame}>
-            Начать новую игру
-          </Button>,
-        ]}
-      >
-        <p>Вы завершили игру! Хотите начать новую?</p>
-      </Modal>
+      {isGameFinished && (
+        <div className="game__finished">
+          <p className="game__finished-title">Вы завершили игру!</p>
+          <Button className="game__finished-btn" onClick={handleNewGame}>Начать новую игру</Button>
+        </div>
+      )}
     </div>
   );
 };
