@@ -46,21 +46,25 @@ const GamePage: React.FC = () => {
   };
 
   const handleDifficultyChange = (selectedDifficulty: Difficulty) => {
+    startNewTimer();
     setDifficulty(selectedDifficulty);
     setIsPaused(isPausedDefault);
   };
 
   const resetTimer = () => {
-  if (intervalRef.current) {
-    clearInterval(intervalRef.current);
-  }
-  setTime(0);
-  intervalRef.current = setInterval(() => {
-    if (!isPaused) {
-      setTime((time) => time + 1);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
     }
-  }, 1000);
-};
+    setTime(0);
+  };
+
+  const startNewTimer = () => {
+    if (!isPaused) {
+      intervalRef.current = setInterval(() => {
+        setTime((time) => time + 1);
+      }, 1000);
+    }
+  };
 
   useEffect(() => {
     generateCards();
@@ -76,7 +80,7 @@ const GamePage: React.FC = () => {
     } else {
       setIsGameFinished(false);
     }
-  }, [cards]);  
+  }, [cards]);
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
@@ -139,7 +143,7 @@ const GamePage: React.FC = () => {
 
       setOpenCards((prevOpenCards) => {
         const updatedOpenCards = [...prevOpenCards, card];
-      
+
         if (updatedOpenCards.length === 2) {
           if (card.value === updatedOpenCards[0].value) {
             setTimeout(() => {
@@ -160,10 +164,10 @@ const GamePage: React.FC = () => {
               setCards(updatedCards);
             }, 700);
           }
-        
+
           return [];
         }
-      
+
         return updatedOpenCards;
       });
     }
@@ -178,6 +182,7 @@ const GamePage: React.FC = () => {
 
   const handleNewGame = () => {
     resetTimer();
+    startNewTimer();
     generateCards();
     setIsPaused(isPausedDefault);
   };
@@ -230,7 +235,9 @@ const GamePage: React.FC = () => {
       {isGameFinished && (
         <div className="game__finished">
           <p className="game__finished-title">Вы завершили игру!</p>
-          <Button className="game__finished-btn" onClick={handleNewGame}>Начать новую игру</Button>
+          <Button className="game__finished-btn" onClick={handleNewGame}>
+            Начать новую игру
+          </Button>
         </div>
       )}
     </div>
